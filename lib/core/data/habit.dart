@@ -8,7 +8,8 @@ class Habit {
   final String id;
   final String name;
   final int targetPerDay;
-  final List<DateTime> completedDates; // Tracks dates when habit was fully completed
+  final List<DateTime>
+  completedDates; // Tracks dates when habit was fully completed
   final DateTime createdAt;
   final bool isArchived;
 
@@ -20,7 +21,7 @@ class Habit {
   // For now, let's stick to the user requirement: "Target per Hari (number)" and "Done/Pending".
   // We will assume if it's in completedDates, it's fully done.
   // But wait, the UI shows "3 of 5 completed". So we need partial progress.
-  
+
   final Map<String, int> dailyProgress; // "yyyy-MM-dd": count
 
   Habit({
@@ -31,8 +32,8 @@ class Habit {
     this.dailyProgress = const {},
     DateTime? createdAt,
     this.isArchived = false,
-  })  : id = id ?? const Uuid().v4(),
-        createdAt = createdAt ?? DateTime.now();
+  }) : id = id ?? const Uuid().v4(),
+       createdAt = createdAt ?? DateTime.now();
 
   // Helper to get progress for a specific date
   int getProgress(DateTime date) {
@@ -46,6 +47,31 @@ class Habit {
 
   String _dateKey(DateTime date) {
     return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+  }
+
+  int get currentStreak {
+    final today = DateTime.now();
+    final yesterday = today.subtract(const Duration(days: 1));
+
+    int streakFromYesterday = 0;
+    DateTime dateCursor = yesterday;
+
+    // Check backwards from yesterday
+    while (true) {
+      if (isCompleted(dateCursor)) {
+        streakFromYesterday++;
+        dateCursor = dateCursor.subtract(const Duration(days: 1));
+      } else {
+        break;
+      }
+    }
+
+    // Add today if completed
+    if (isCompleted(today)) {
+      return streakFromYesterday + 1;
+    } else {
+      return streakFromYesterday;
+    }
   }
 
   Habit copyWith({

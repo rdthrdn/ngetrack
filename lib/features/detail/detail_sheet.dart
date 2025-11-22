@@ -6,6 +6,7 @@ import 'package:ngetrack/core/theme/app_theme.dart';
 import 'package:ngetrack/core/widgets/dots_day_row.dart';
 import 'package:ngetrack/core/widgets/glass_card.dart';
 import 'package:ngetrack/core/widgets/soft_button.dart';
+import 'package:ngetrack/features/detail/widgets/pulsing_streak.dart';
 
 class DetailSheet extends ConsumerWidget {
   final String? habitId;
@@ -27,6 +28,7 @@ class DetailSheet extends ConsumerWidget {
 
     final today = DateTime.now();
     final currentProgress = habit.getProgress(today);
+    final isCompletedToday = habit.isCompleted(today);
 
     // Calculate weekly completion
     final weekDates = List.generate(7, (i) {
@@ -44,9 +46,8 @@ class DetailSheet extends ConsumerWidget {
         .toList()
         .cast<bool>();
 
-    // Calculate streak (naive implementation)
-    int streak = 0;
-    // ... streak logic ...
+    // Calculate streak
+    int streak = habit.currentStreak;
 
     return Container(
       decoration: BoxDecoration(
@@ -84,22 +85,7 @@ class DetailSheet extends ConsumerWidget {
             // Streak & History
             Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppTheme.pink900.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    "🔥 Streak ${streak}d",
-                    style: AppTheme.textTheme.labelLarge?.copyWith(
-                      color: AppTheme.pink900,
-                    ),
-                  ),
-                ),
+                PulsingStreak(streak: streak, isCompleted: isCompletedToday),
                 const Spacer(),
                 TextButton(
                   onPressed: () {},
