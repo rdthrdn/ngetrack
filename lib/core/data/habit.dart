@@ -23,6 +23,7 @@ class Habit {
   // But wait, the UI shows "3 of 5 completed". So we need partial progress.
 
   final Map<String, int> dailyProgress; // "yyyy-MM-dd": count
+  final String? reminderTime; // "HH:mm" format
 
   Habit({
     String? id,
@@ -30,6 +31,7 @@ class Habit {
     required this.targetPerDay,
     this.completedDates = const [],
     this.dailyProgress = const {},
+    this.reminderTime, // "HH:mm" format, e.g. "19:00"
     DateTime? createdAt,
     this.isArchived = false,
   }) : id = id ?? const Uuid().v4(),
@@ -79,6 +81,7 @@ class Habit {
     int? targetPerDay,
     List<DateTime>? completedDates,
     Map<String, int>? dailyProgress,
+    String? reminderTime,
     bool? isArchived,
   }) {
     return Habit(
@@ -87,6 +90,7 @@ class Habit {
       targetPerDay: targetPerDay ?? this.targetPerDay,
       completedDates: completedDates ?? this.completedDates,
       dailyProgress: dailyProgress ?? this.dailyProgress,
+      reminderTime: reminderTime ?? this.reminderTime,
       createdAt: createdAt,
       isArchived: isArchived ?? this.isArchived,
     );

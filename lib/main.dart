@@ -3,7 +3,12 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:ngetrack/core/theme/app_theme.dart';
 import 'package:ngetrack/routes/app_router.dart';
 
-void main() {
+import 'package:ngetrack/core/services/notification_service.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await NotificationService().init();
+
   runApp(const ProviderScope(child: NgeTrackApp()));
 }
 

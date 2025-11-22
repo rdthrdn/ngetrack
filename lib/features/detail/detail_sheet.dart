@@ -7,6 +7,7 @@ import 'package:ngetrack/core/widgets/dots_day_row.dart';
 import 'package:ngetrack/core/widgets/glass_card.dart';
 import 'package:ngetrack/core/widgets/soft_button.dart';
 import 'package:ngetrack/features/detail/widgets/pulsing_streak.dart';
+import 'package:ngetrack/core/services/feedback_service.dart';
 
 class DetailSheet extends ConsumerWidget {
   final String? habitId;
@@ -114,6 +115,7 @@ class DetailSheet extends ConsumerWidget {
               children: [
                 GestureDetector(
                   onTap: () {
+                    FeedbackService().selection();
                     ref
                         .read(habitProvider.notifier)
                         .updateProgress(habit.id, today, -1);
@@ -128,6 +130,7 @@ class DetailSheet extends ConsumerWidget {
                 const SizedBox(width: 24),
                 GestureDetector(
                   onTap: () {
+                    FeedbackService().light();
                     ref
                         .read(habitProvider.notifier)
                         .updateProgress(habit.id, today, 1);

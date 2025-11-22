@@ -20,6 +20,7 @@ Habit _$HabitFromJson(Map<String, dynamic> json) => Habit(
         (k, e) => MapEntry(k, (e as num).toInt()),
       ) ??
       const {},
+  reminderTime: json['reminderTime'] as String?,
   createdAt: json['createdAt'] == null
       ? null
       : DateTime.parse(json['createdAt'] as String),
@@ -36,4 +37,5 @@ Map<String, dynamic> _$HabitToJson(Habit instance) => <String, dynamic>{
   'createdAt': instance.createdAt.toIso8601String(),
   'isArchived': instance.isArchived,
   'dailyProgress': instance.dailyProgress,
+  'reminderTime': instance.reminderTime,
 };

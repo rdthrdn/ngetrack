@@ -8,6 +8,7 @@ import 'package:ngetrack/core/widgets/glass_card.dart';
 import 'package:ngetrack/core/widgets/progress_ring.dart';
 import 'package:ngetrack/core/widgets/soft_chip.dart';
 import 'package:ngetrack/features/detail/detail_sheet.dart';
+import 'package:ngetrack/core/services/feedback_service.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -33,7 +34,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       if (_selectedChipIndex == 1) return isDone;
       if (_selectedChipIndex == 2) return !isDone;
       // Mock "On Streak" logic for now (e.g., completed yesterday and today)
-      if (_selectedChipIndex == 3) return isDone; 
+      if (_selectedChipIndex == 3) return isDone;
       return true;
     }).toList();
 
@@ -51,11 +52,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFFEFECED),
-                  AppTheme.pink50,
-                  Color(0x14B97980),
-                ],
+                colors: [Color(0xFFEFECED), AppTheme.pink50, Color(0x14B97980)],
               ),
             ),
           ),
@@ -65,10 +62,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               children: [
                 const SizedBox(height: 16),
                 // Header
-                Text(
-                  dateStr,
-                  style: AppTheme.textTheme.headlineSmall,
-                ),
+                Text(dateStr, style: AppTheme.textTheme.headlineSmall),
                 const SizedBox(height: 24),
 
                 // Hero Section
@@ -103,10 +97,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             children: [
                               Text(
                                 "${(progress * 100).toInt()}%",
-                                style: AppTheme.textTheme.displayMedium?.copyWith(
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: AppTheme.textTheme.displayMedium
+                                    ?.copyWith(
+                                      fontSize: 32,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                               ),
                               Text(
                                 "Complete",
@@ -161,10 +156,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           ),
                         )
                       : ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 8,
+                          ),
                           itemCount: filteredHabits.length,
                           itemBuilder: (context, index) {
-                            return _buildHabitItem(filteredHabits[index], today);
+                            return _buildHabitItem(
+                              filteredHabits[index],
+                              today,
+                            );
                           },
                         ),
                 ),
@@ -179,7 +180,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildHabitItem(Habit habit, DateTime today) {
     final isDone = habit.isCompleted(today);
     final currentProgress = habit.getProgress(today);
-    final progressRatio = habit.targetPerDay == 0 ? 0.0 : (currentProgress / habit.targetPerDay).clamp(0.0, 1.0);
+    final progressRatio = habit.targetPerDay == 0
+        ? 0.0
+        : (currentProgress / habit.targetPerDay).clamp(0.0, 1.0);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -201,7 +204,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 children: [
                   Text(
                     habit.name,
-                    style: AppTheme.textTheme.titleLarge?.copyWith(fontSize: 18),
+                    style: AppTheme.textTheme.titleLarge?.copyWith(
+                      fontSize: 18,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   LinearProgressIndicator(
@@ -217,12 +222,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             const SizedBox(width: 16),
             GestureDetector(
               onTap: () {
-                ref.read(habitProvider.notifier).toggleHabit(habit.id, today);
+                _toggleHabit(ref, habit);
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
-                  color: isDone ? AppTheme.pink900.withValues(alpha: 0.1) : Colors.transparent,
+                  color: isDone
+                      ? AppTheme.pink900.withValues(alpha: 0.1)
+                      : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: isDone ? Colors.transparent : AppTheme.glassBorder,
@@ -240,5 +250,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
       ),
     );
+  }
+
+  void _toggleHabit(WidgetRef ref, Habit habit) {
+    final today = DateTime.now();
+    final isCompleted = habit.isCompleted(today);
+
+    if (!isCompleted) {
+      FeedbackService().medium(); // Haptic
+      FeedbackService().playSuccess(); // Sound
+    } else {
+      FeedbackService().light();
+    }
+
+    ref.read(habitProvider.notifier).toggleHabit(habit.id, today);
   }
 }
